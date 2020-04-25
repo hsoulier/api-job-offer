@@ -1,4 +1,5 @@
 const express = require('express')
+const bodyParser = require('body-parser');
 const cors = require('cors')
 const faker = require('faker')
 const app = express()
@@ -19,18 +20,23 @@ for (let i = 1; i < 21; i++) {
         duration: Math.round(Math.random() * 20 + 1),
         location: faker.address.city(),
         departement: arrDep[Math.floor(Math.random() * arrDep.length)],
-        date: date.toLocaleDateString('fr-FR').replace(regex, '/'),
-        email: faker.internet.email()
+        email: faker.internet.email(),
+        date: date.toLocaleDateString('fr-FR').replace(regex, '/')
     }]
 }
 // console.log(jobs)
 
-app.use(express.urlencoded({
-    extended: false,
-    type: "application/x-www-form-urlencoded"
-}))
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
+app.use(bodyParser.json());
 app.use(cors())
 
+
+// VERSION API
+app.get('/api/:version', function (req, res) {
+    res.send(req.query.version)
+});
 // BASE API REST
 app.get(`/${baseURL}/job`, (req, res) => {
     res.send(jobs)
@@ -57,42 +63,60 @@ app.get(`/${baseURL}/job/byDep/:dep`, (req, res) => {
 // POST JOBS
 app.post(`/${baseURL}/job`, (req, res) => {
     const id = jobs.length + 1
-    const title = req.param('title')
-    const description = req.param('description')
-    const duration = req.param('duration')
-    const location = req.param('location')
+    const title = req.query.title
+    const description = req.query.description
+    const duration = parseInt(req.query.duration, 10)
+    const location = req.query.location
+    const email = req.query.email
     const date = new Date().toLocaleDateString('fr-FR').replace(/-/g, '/')
-
-    if (!title || !description || !duration || !location) {
-        res.send('Input missing from the form, retry please')
-        return
+    const obj = {
+        id,
+        title,
+        description,
+        duration,
+        location,
+        email,
+        date
     }
 
+    if (!title) {
+        res.send('Title missing')
+    }
+    if (!description) {
+        res.send('Descrption missing')
+    }
+    if (!duration) {
+        res.send("Duration missing")
+    }
+    if (!location) {
+        res.send('Location missing')
+    }
+    if (!title || !description || !duration || !location) {
+        // res.send('Input missing from the form, retry please')
+        return
+    }
     jobs = [...jobs, {
         id,
         title,
         description,
         duration,
         location,
-        date
+        date,
+        email
     }]
-    res.send(jobs)
+    res.send("L'annonce a été posté")
 })
+
+
+
+
 
 // ! TODO
 // MODIFY JOB OFFER
 app.put(`/${baseURL}/job/:id`, (req, res) => {
-    // const id = req.param('id')
-    // res.json({
-    //     data: req.body
-    // })
     res.json({
         data: undefined
     })
 })
 
-// VERSION API
-app.get('/api/:version', function (req, res) {
-    res.send(req.param('version'))
-});
-app.listen(3000, () => console.log(`Serveur lancé sur http://localhost:3000/${baseURL}/`))
+app.listen(3000, () => console.log(`Serveur lancé sur http://localhost:3000/${baseURL}/job`))
