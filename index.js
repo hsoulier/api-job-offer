@@ -6,6 +6,7 @@ const app = express()
 let version = 1
 let baseURL = `api/v${version}`
 let jobs = []
+const arrDep = [04, 05, 06, 13, 83, 84]
 
 // faker.locale = "fr"
 for (let i = 1; i < 21; i++) {
@@ -15,12 +16,12 @@ for (let i = 1; i < 21; i++) {
         id: i,
         title: faker.name.jobTitle(),
         description: faker.lorem.paragraphs(3),
-        duration: Math.round(Math.random() * 20),
+        duration: Math.round(Math.random() * 20 + 1),
         location: faker.address.city(),
+        departement: arrDep[Math.floor(Math.random() * arrDep.length)],
         date: date.toLocaleDateString('fr-FR').replace(regex, '/')
     }]
 }
-
 console.log(jobs)
 
 app.use(express.urlencoded({ extended: false,
@@ -37,6 +38,20 @@ app.get(`/${baseURL}/job/:id`, (req, res) => {
     const id = parseInt(req.params.id)
     res.send(jobs[id - 1] || false)
 })
+// SELECT BY DEPARTEMENT
+app.get(`/${baseURL}/job/byDep/:dep`, (req, res) => {
+    const dep = parseInt(req.params.dep)
+    let result = []
+    jobs.forEach(el => {
+        console.log(el['a'])
+        if (el['departement'] === dep) {
+            result = [...result, el]
+        }
+    })
+    res.send(result)
+
+})
+
 // POST JOBS
 app.post(`/${baseURL}/job`, (req, res) => {
     const id = jobs.length + 1
@@ -54,6 +69,8 @@ app.post(`/${baseURL}/job`, (req, res) => {
     jobs = [...jobs, {id, title, description, duration, location, date}]
     res.send(jobs)
 })
+
+
 // ! TODO
 // MODIFY JOB OFFER
 app.put(`/${baseURL}/job/:id`, (req, res) => {
