@@ -22,10 +22,11 @@ for (let i = 1; i < 21; i++) {
         date: date.toLocaleDateString('fr-FR').replace(regex, '/')
     }]
 }
-console.log(jobs)
+// console.log(jobs)
 
-app.use(express.urlencoded({ extended: false,
-type: "application/x-www-form-urlencoded"
+app.use(express.urlencoded({
+    extended: false,
+    type: "application/x-www-form-urlencoded"
 }))
 app.use(cors())
 
@@ -42,13 +43,17 @@ app.get(`/${baseURL}/job/:id`, (req, res) => {
 app.get(`/${baseURL}/job/byDep/:dep`, (req, res) => {
     const dep = parseInt(req.params.dep)
     let result = []
-    jobs.forEach(el => {
-        console.log(el['a'])
+    let index = 1
+    for (let i = 0; i < jobs.length; i++) {
+        let el = jobs[i]
         if (el['departement'] === dep) {
+            el['id'] = index
             result = [...result, el]
+            index++
         }
-    })
+    }
     res.send(result)
+
 
 })
 
@@ -61,12 +66,19 @@ app.post(`/${baseURL}/job`, (req, res) => {
     const location = req.param('location')
     const date = new Date().toLocaleDateString('fr-FR').replace(/-/g, '/')
 
-    if(!title || !description || !duration || !location) {
+    if (!title || !description || !duration || !location) {
         res.send('Input missing from the form')
         return
     }
-    
-    jobs = [...jobs, {id, title, description, duration, location, date}]
+
+    jobs = [...jobs, {
+        id,
+        title,
+        description,
+        duration,
+        location,
+        date
+    }]
     res.send(jobs)
 })
 
@@ -78,7 +90,9 @@ app.put(`/${baseURL}/job/:id`, (req, res) => {
     // res.json({
     //     data: req.body
     // })
-    res.json({data: undefined})
+    res.json({
+        data: undefined
+    })
 })
 
 // VERSION API
