@@ -19,7 +19,8 @@ for (let i = 1; i < 21; i++) {
         duration: Math.round(Math.random() * 20 + 1),
         location: faker.address.city(),
         departement: arrDep[Math.floor(Math.random() * arrDep.length)],
-        date: date.toLocaleDateString('fr-FR').replace(regex, '/')
+        date: date.toLocaleDateString('fr-FR').replace(regex, '/'),
+        email: faker.internet.email()
     }]
 }
 // console.log(jobs)
@@ -43,17 +44,13 @@ app.get(`/${baseURL}/job/:id`, (req, res) => {
 app.get(`/${baseURL}/job/byDep/:dep`, (req, res) => {
     const dep = parseInt(req.params.dep)
     let result = []
-    let index = 1
-    for (let i = 0; i < jobs.length; i++) {
-        let el = jobs[i]
+    jobs.forEach(el => {
+        console.log(el['a'])
         if (el['departement'] === dep) {
-            el['id'] = index
             result = [...result, el]
-            index++
         }
-    }
+    })
     res.send(result)
-
 
 })
 
@@ -67,7 +64,7 @@ app.post(`/${baseURL}/job`, (req, res) => {
     const date = new Date().toLocaleDateString('fr-FR').replace(/-/g, '/')
 
     if (!title || !description || !duration || !location) {
-        res.send('Input missing from the form')
+        res.send('Input missing from the form, retry please')
         return
     }
 
@@ -81,7 +78,6 @@ app.post(`/${baseURL}/job`, (req, res) => {
     }]
     res.send(jobs)
 })
-
 
 // ! TODO
 // MODIFY JOB OFFER
