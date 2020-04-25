@@ -68,6 +68,7 @@ app.post(`/${baseURL}/job`, (req, res) => {
     const duration = parseInt(req.query.duration, 10)
     const location = req.query.location
     const email = req.query.email
+    const departement = parseInt(req.query.departement, 10)
     const date = new Date().toLocaleDateString('fr-FR').replace(/-/g, '/')
     const obj = {
         id,
@@ -76,6 +77,7 @@ app.post(`/${baseURL}/job`, (req, res) => {
         duration,
         location,
         email,
+        departement,
         date
     }
 
