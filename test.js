@@ -26,9 +26,7 @@ for (let i = 1; i < 21; i++) {
 }
 // console.log(jobs)
 
-app.use(bodyParser.urlencoded({
-    extended: false
-}));
+app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(cors())
 
@@ -41,7 +39,7 @@ app.get('/api/:version', function (req, res) {
 app.get(`/${baseURL}/job`, (req, res) => {
     res.send(jobs)
 })
-// SELECT BY ID
+// SELECT BY ID 
 app.get(`/${baseURL}/job/:id`, (req, res) => {
     const id = parseInt(req.params.id)
     res.send(jobs[id - 1] || false)
@@ -68,8 +66,9 @@ app.post(`/${baseURL}/job`, (req, res) => {
     const duration = parseInt(req.query.duration, 10)
     const location = req.query.location
     const email = req.query.email
-    const departement = parseInt(req.query.departement, 10)
     const date = new Date().toLocaleDateString('fr-FR').replace(/-/g, '/')
+    const obj = {id, title, description, duration, location, email, date}
+
     if (!title) {
         res.send('Title missing')
     }
@@ -93,10 +92,9 @@ app.post(`/${baseURL}/job`, (req, res) => {
         duration,
         location,
         date,
-        email,
-        departement
+        email
     }]
-    res.send("Votre annonce a été enregistré avec succès")
+    res.send("L'annonce a été posté")
 })
 
 
@@ -106,9 +104,7 @@ app.post(`/${baseURL}/job`, (req, res) => {
 // ! TODO
 // MODIFY JOB OFFER
 app.put(`/${baseURL}/job/:id`, (req, res) => {
-    res.json({
-        data: undefined
-    })
+    res.json({data: undefined})
 })
 
 app.listen(3000, () => console.log(`Serveur lancé sur http://localhost:3000/${baseURL}/job`))
